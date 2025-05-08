@@ -63,6 +63,8 @@ public class ChessPiece {
             moves = getRookMoves(board, myPosition);
         } else if (type == PieceType.QUEEN){
             moves = getQueenMoves(board, myPosition);
+        } else if (type == PieceType.KNIGHT){
+            moves = getKnightMoves(board, myPosition);
         }
 
         return moves;
@@ -116,6 +118,23 @@ public class ChessPiece {
         Collection<ChessMove> moves = new ArrayList<>();
         moves.addAll(getBishopMoves(board, pos));
         moves.addAll(getRookMoves(board, pos));
+        return moves;
+    }
+
+    // returns Knight's moves
+    private Collection<ChessMove> getKnightMoves(ChessBoard board, ChessPosition pos){
+        Collection<ChessMove> moves = new ArrayList<>();
+        int[][] moveSet = new int[][]{
+                {2, 1}, {2, -1}, {1, 2}, {1, -2},
+                {-2, 1}, {-2, -1}, {-1, 2}, {-1, -2}
+        };
+        for(int[] set : moveSet){
+            ChessPosition posNew = new ChessPosition(pos.getRow() + set[0], pos.getColumn() + set[1]);
+            ChessMove move = new ChessMove(pos, posNew, null);
+            if(inBounds(move) && !colorCheck(move, board)){
+                moves.add(move);
+            }
+        }
         return moves;
     }
 
