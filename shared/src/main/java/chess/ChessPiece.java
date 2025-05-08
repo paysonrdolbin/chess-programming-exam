@@ -61,6 +61,8 @@ public class ChessPiece {
             moves = getBishopMoves(board, myPosition);
         } else if (type == PieceType.ROOK){
             moves = getRookMoves(board, myPosition);
+        } else if (type == PieceType.QUEEN){
+            moves = getQueenMoves(board, myPosition);
         }
 
         return moves;
@@ -106,6 +108,14 @@ public class ChessPiece {
         moves.addAll(getDiagonals(0, 1, pos, board));
         // left moves
         moves.addAll(getDiagonals(0, -1, pos, board));
+        return moves;
+    }
+
+    // returns Queen's moves
+    private Collection<ChessMove> getQueenMoves(ChessBoard board, ChessPosition pos){
+        Collection<ChessMove> moves = new ArrayList<>();
+        moves.addAll(getBishopMoves(board, pos));
+        moves.addAll(getRookMoves(board, pos));
         return moves;
     }
 
