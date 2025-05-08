@@ -147,10 +147,11 @@ public class ChessPiece {
         // Black pawn's available moves
         if(board.getPiece(pos).getTeamColor() == ChessGame.TeamColor.BLACK){
             // moves 2 spaces on starting row
+            ChessPosition posMove1 = new ChessPosition(pos.getRow()-1, pos.getColumn());
             if(pos.getRow() == 7){
-                ChessPosition posMove2 = new ChessPosition(pos.getRow()+2, pos.getColumn());
+                ChessPosition posMove2 = new ChessPosition(5, pos.getColumn());
                 ChessMove move2 = new ChessMove(pos, posMove2, null);
-                if(board.getPiece(posMove2) != null){
+                if(board.getPiece(posMove1) == null && board.getPiece(posMove2) == null){
                     moves.add(move2);
                 }
             }
@@ -159,15 +160,38 @@ public class ChessPiece {
                 for(PieceType piece: pieces){
                     ChessPosition posMovePromote = new ChessPosition(1, pos.getColumn());
                     ChessMove movePromote = new ChessMove(pos, posMovePromote, piece);
-                    if(board.getPiece(posMovePromote) != null){
+                    if(board.getPiece(posMovePromote) == null){
                         moves.add(movePromote);
                     }
                 }
             // moves one space normally if in bounds
             } else{
-                ChessMove move1 = new ChessMove(pos, new ChessPosition(pos.getRow()+1,pos.getColumn()), null);
-                if(!colorCheck(move1, board) && inBounds(move1)){
+                ChessMove move1 = new ChessMove(pos, new ChessPosition(pos.getRow()-1,pos.getColumn()), null);
+                if(board.getPiece(posMove1) == null && inBounds(move1)){
                     moves.add(move1);
+                }
+            }
+            // kill moves
+            int[] killSet = {-1, 1};
+            for(int i: killSet){
+                ChessPosition posKillMove = new ChessPosition(pos.getRow()-1, pos.getColumn()+i);
+                ChessMove killMove = new ChessMove(pos, posKillMove, null);
+                // if the kill position isn't empty
+                if (inBounds(killMove) && board.getPiece(posKillMove) != null){
+                    // if the kill move creates a promotion
+                    if(pos.getRow() == 2){
+                        for(PieceType piece: pieces) {
+                            ChessMove movePromote = new ChessMove(pos, posKillMove, piece);
+                            if (!colorCheck(movePromote, board)) {
+                                moves.add(movePromote);
+                            }
+                        }
+                    // otherwise, act as follows
+                    } else{
+                        if(!colorCheck(killMove, board)){
+                            moves.add(killMove);
+                        }
+                    }
                 }
             }
         }
@@ -175,7 +199,54 @@ public class ChessPiece {
 
         // White pawn's available moves
         if(board.getPiece(pos).getTeamColor() == ChessGame.TeamColor.WHITE){
-
+            ChessPosition posMove1 = new ChessPosition(pos.getRow()+1, pos.getColumn());
+            // moves 2 spaces on starting row
+            if(pos.getRow() == 2){
+                ChessPosition posMove2 = new ChessPosition(4, pos.getColumn());
+                ChessMove move2 = new ChessMove(pos, posMove2, null);
+                if(board.getPiece(posMove1) == null && board.getPiece(posMove2) == null){
+                    moves.add(move2);
+                }
+            }
+            // adds a promotion move for each piece type moving on to the final row
+            if(pos.getRow() == 7){
+                for(PieceType piece: pieces){
+                    ChessPosition posMovePromote = new ChessPosition(8, pos.getColumn());
+                    ChessMove movePromote = new ChessMove(pos, posMovePromote, piece);
+                    if(board.getPiece(posMovePromote) == null){
+                        moves.add(movePromote);
+                    }
+                }
+                // moves one space normally if in bounds
+            } else{
+                ChessMove move1 = new ChessMove(pos, posMove1, null);
+                if(board.getPiece(posMove1) == null && inBounds(move1)){
+                    moves.add(move1);
+                }
+            }
+            // kill moves
+            int[] killSet = {-1, 1};
+            for(int i: killSet){
+                ChessPosition posKillMove = new ChessPosition(pos.getRow()+1, pos.getColumn()+i);
+                ChessMove killMove = new ChessMove(pos, posKillMove, null);
+                // if the kill position isn't empty
+                if (inBounds(killMove) && board.getPiece(posKillMove) != null){
+                    // if the kill move creates a promotion
+                    if(pos.getRow() == 7){
+                        for(PieceType piece: pieces) {
+                            ChessMove movePromote = new ChessMove(pos, posKillMove, piece);
+                            if (!colorCheck(movePromote, board)) {
+                                moves.add(movePromote);
+                            }
+                        }
+                        // otherwise, act as follows
+                    } else{
+                        if(!colorCheck(killMove, board)){
+                            moves.add(killMove);
+                        }
+                    }
+                }
+            }
         }
         return moves;
     }
