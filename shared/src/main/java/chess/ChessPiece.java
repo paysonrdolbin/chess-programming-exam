@@ -65,6 +65,8 @@ public class ChessPiece {
             moves = getQueenMoves(board, myPosition);
         } else if (type == PieceType.KNIGHT){
             moves = getKnightMoves(board, myPosition);
+        } else if (type == PieceType.PAWN){
+            moves = getPawnMoves(board, myPosition);
         }
 
         return moves;
@@ -134,6 +136,46 @@ public class ChessPiece {
             if(inBounds(move) && !colorCheck(move, board)){
                 moves.add(move);
             }
+        }
+        return moves;
+    }
+
+    // return's Pawn's moves
+    private Collection<ChessMove> getPawnMoves(ChessBoard board, ChessPosition pos){
+        Collection<ChessMove> moves = new ArrayList<>();
+        PieceType[] pieces = {PieceType.QUEEN, PieceType.BISHOP, PieceType.KNIGHT, PieceType.ROOK};
+        // Black pawn's available moves
+        if(board.getPiece(pos).getTeamColor() == ChessGame.TeamColor.BLACK){
+            // moves 2 spaces on starting row
+            if(pos.getRow() == 7){
+                ChessPosition posMove2 = new ChessPosition(pos.getRow()+2, pos.getColumn());
+                ChessMove move2 = new ChessMove(pos, posMove2, null);
+                if(board.getPiece(posMove2) != null){
+                    moves.add(move2);
+                }
+            }
+            // adds a promotion move for each piece type moving on to the final row
+            if(pos.getRow() == 2){
+                for(PieceType piece: pieces){
+                    ChessPosition posMovePromote = new ChessPosition(1, pos.getColumn());
+                    ChessMove movePromote = new ChessMove(pos, posMovePromote, piece);
+                    if(board.getPiece(posMovePromote) != null){
+                        moves.add(movePromote);
+                    }
+                }
+            // moves one space normally if in bounds
+            } else{
+                ChessMove move1 = new ChessMove(pos, new ChessPosition(pos.getRow()+1,pos.getColumn()), null);
+                if(!colorCheck(move1, board) && inBounds(move1)){
+                    moves.add(move1);
+                }
+            }
+        }
+
+
+        // White pawn's available moves
+        if(board.getPiece(pos).getTeamColor() == ChessGame.TeamColor.WHITE){
+
         }
         return moves;
     }
